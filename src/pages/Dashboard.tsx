@@ -1,19 +1,21 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Upload, Sparkles, FolderOpen, Settings, Package, LogIn } from "lucide-react";
+import { FolderOpen, Settings, LogIn, Wand2, Film, Layers } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Badge } from "@/components/ui/badge";
-import { AssetLibrary } from "@/components/dashboard/AssetLibrary";
-import { UploadZone } from "@/components/dashboard/UploadZone";
-import { PipelineStatus } from "@/components/dashboard/PipelineStatus";
+import { BunnyMascot } from "@/components/BunnyMascot";
+import { AssetLibraryNew } from "@/components/library/AssetLibraryNew";
+import { AIStudio } from "@/components/studio/AIStudio";
+import { SequencingWorkspace } from "@/components/sequencer/SequencingWorkspace";
+import { SettingsModal, useSettings } from "@/components/SettingsModal";
 import { useAuth } from "@/hooks/useAuth";
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
   const [activeTab, setActiveTab] = useState("library");
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const { settings, updateSettings } = useSettings();
 
   const handleSignOut = async () => {
     await signOut();
@@ -23,99 +25,83 @@ const Dashboard = () => {
   return (
     <div className="min-h-screen bg-gradient-accent">
       {/* Header */}
-      <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-6 py-4">
+      <header className="border-b border-border bg-card/80 backdrop-blur-sm sticky top-0 z-50">
+        <div className="container mx-auto px-6 py-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-primary flex items-center justify-center shadow-glow">
-                <Sparkles className="w-5 h-5 text-primary-foreground" />
-              </div>
+              <BunnyMascot size="sm" animated={false} />
               <div>
-                <div className="flex items-center gap-2">
-                  <h1 className="text-xl font-bold bg-gradient-primary bg-clip-text text-transparent">
-                    VTuber Asset Creator
-                  </h1>
-                  <Badge variant="secondary" className="text-xs">Demo</Badge>
-                </div>
-                <p className="text-xs text-muted-foreground">Creator Dashboard</p>
+                <h1 className="text-xl font-bold text-gradient">
+                  VTuber Asset Creator
+                </h1>
+                <p className="text-xs text-muted-foreground">Make cute things! 🐰</p>
               </div>
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
               {user ? (
-                <>
-                  <Button variant="outline" size="sm" onClick={handleSignOut}>
-                    Sign Out
-                  </Button>
-                  <Button variant="outline" size="sm">
-                    <Settings className="w-4 h-4 mr-2" />
-                    Settings
-                  </Button>
-                </>
+                <Button variant="outline" size="sm" onClick={handleSignOut}>
+                  Sign Out
+                </Button>
               ) : (
                 <Button variant="outline" size="sm" onClick={() => navigate("/auth")}>
                   <LogIn className="w-4 h-4 mr-2" />
                   Sign In
                 </Button>
               )}
+              <Button variant="outline" size="sm" onClick={() => setSettingsOpen(true)}>
+                <Settings className="w-4 h-4" />
+              </Button>
             </div>
           </div>
         </div>
       </header>
 
       {/* Main Content */}
-      <main className="container mx-auto px-6 py-8">
-        <div className="mb-8">
-          <h2 className="text-3xl font-bold mb-2">Welcome to the Demo!</h2>
-          <p className="text-muted-foreground">
-            Explore the VTuber asset creation interface. AI processing is simulated in demo mode.
-          </p>
-        </div>
-
+      <main className="container mx-auto px-6 py-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="bg-card shadow-card">
+          <TabsList className="bg-card shadow-soft">
             <TabsTrigger value="library" className="gap-2">
               <FolderOpen className="w-4 h-4" />
               Asset Library
             </TabsTrigger>
-            <TabsTrigger value="upload" className="gap-2">
-              <Upload className="w-4 h-4" />
-              Upload
+            <TabsTrigger value="studio" className="gap-2">
+              <Wand2 className="w-4 h-4" />
+              AI Studio
             </TabsTrigger>
-            <TabsTrigger value="pipeline" className="gap-2">
-              <Sparkles className="w-4 h-4" />
-              Pipeline Status
+            <TabsTrigger value="sequences" className="gap-2">
+              <Layers className="w-4 h-4" />
+              Sequences
             </TabsTrigger>
-            <TabsTrigger value="publish" className="gap-2">
-              <Package className="w-4 h-4" />
-              Publish
+            <TabsTrigger value="sequencer" className="gap-2">
+              <Film className="w-4 h-4" />
+              Sequencer
             </TabsTrigger>
           </TabsList>
 
           <TabsContent value="library">
-            <AssetLibrary />
+            <AssetLibraryNew />
           </TabsContent>
 
-          <TabsContent value="upload">
-            <UploadZone />
+          <TabsContent value="studio">
+            <AIStudio />
           </TabsContent>
 
-          <TabsContent value="pipeline">
-            <PipelineStatus />
+          <TabsContent value="sequences">
+            <AssetLibraryNew />
           </TabsContent>
 
-          <TabsContent value="publish">
-            <Card className="p-12 text-center shadow-card">
-              <Package className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
-              <h3 className="text-xl font-semibold mb-2">Marketplace Integration</h3>
-              <p className="text-muted-foreground mb-4 max-w-md mx-auto">
-                Shopify integration is currently disabled. Enable it in Settings → Tools to publish
-                your asset packs to the marketplace.
-              </p>
-              <Button variant="outline">Configure Marketplace</Button>
-            </Card>
+          <TabsContent value="sequencer">
+            <SequencingWorkspace />
           </TabsContent>
         </Tabs>
       </main>
+
+      <SettingsModal
+        open={settingsOpen}
+        onOpenChange={setSettingsOpen}
+        settings={settings}
+        onSettingsChange={updateSettings}
+      />
     </div>
   );
 };
